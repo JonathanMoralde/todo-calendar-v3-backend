@@ -18,7 +18,7 @@ router.get("/getTask/:date", async (req, res) => {
         res.status(404).json({ error: "No tasks for this date yet" });
       }
     } else {
-      res.status(404).json({ error: "Date not found" });
+      res.status(200).json([]);
     }
   } catch (error) {
     res.status(500).json({ error: "Error occured while getting the tasks" });

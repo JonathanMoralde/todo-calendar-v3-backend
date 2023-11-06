@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const addTask = require("./api/addTask");
 const getTask = require("./api/getTask");
 const getDates = require("./api/getDateWithTask");
@@ -20,6 +21,9 @@ mongoose
 
 app.use(express.json());
 
+// Allow requests from http://localhost:3000
+app.use(cors({ origin: "http://localhost:3000" }));
+
 // POST - NEW TASK
 app.use("/api", addTask);
 
@@ -36,6 +40,6 @@ app.use("/api", updateTask);
 app.use("/api", updateTaskStatus);
 
 // DELETE TASK
-app.use("api", deleteTask);
+app.use("/api", deleteTask);
 
 app.listen(PORT, () => console.log(`Listening on: ${PORT}`));
