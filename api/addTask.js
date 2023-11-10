@@ -1,9 +1,10 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const Date = require("../models/task");
 
 const router = express.Router();
 
-router.use(express.json());
+router.use(bodyParser.json());
 
 router.post("/addTask", async (req, res) => {
   const { date, task } = req.body;

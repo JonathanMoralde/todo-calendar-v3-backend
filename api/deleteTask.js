@@ -1,8 +1,9 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const Date = require("../models/task");
 
 const router = express.Router();
-router.use(express.json());
+router.use(bodyParser.json());
 
 router.delete("/deleteTask/:taskId", async (req, res) => {
   const { taskId } = req.params;
