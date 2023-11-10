@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const addTask = require("./api/addTask");
 const getTask = require("./api/getTask");
@@ -22,10 +23,11 @@ mongoose
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.log(err));
 
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Allow requests from http://localhost:3000
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "https://splendid-squirrel-84a56d.netlify.app" }));
 
 // POST - NEW TASK
 app.use("/api", addTask);
