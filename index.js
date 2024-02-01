@@ -8,6 +8,7 @@ const getDates = require("./api/getDateWithTask");
 const updateTask = require("./api/updateTask");
 const updateTaskStatus = require("./api/updateTaskStatus");
 const deleteTask = require("./api/deleteTask");
+const registerUser = require("./api/auth/registerUser");
 
 require("dotenv").config();
 
@@ -46,5 +47,8 @@ app.use("/api", updateTaskStatus);
 
 // DELETE TASK
 app.use("/api", deleteTask);
+
+// CREATE USER
+app.use("/user", registerUser);
 
 app.listen(PORT, () => console.log(`Listening on: ${PORT}`));
