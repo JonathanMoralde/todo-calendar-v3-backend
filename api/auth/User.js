@@ -90,31 +90,45 @@ router.post("/signup", async (req, res) => {
         });
       });
   }
+});
 
-  try {
-    // const existingDate = await Date.findOne({ date });
-    // let dateid;
-    // let taskId;
-    // if (existingDate) {
-    //   // Date already exists, add the task to it
-    //   existingDate.tasks.push(task);
-    //   await existingDate.save();
-    //   dateid = existingDate._id;
-    //   taskId = existingDate.tasks[existingDate.tasks.length - 1]._id;
-    // } else {
-    //   // Date doesn't exist, create a new date document with the task
-    //   const newDate = new Date({ date, tasks: [task] });
-    //   await newDate.save();
-    //   dateid = newDate._id;
-    //   taskId = newDate.tasks[0]._id;
-    // }
-    // res
-    //   .status(201)
-    //   .json({ message: "Task added successfully", dateid, taskId });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while registering the user" });
+router.post("/signin", (req, res) => {
+  let { email, password } = req.body;
+
+  if (email == "" || password == "") {
+    res.status(500).json({
+      error: "Empty credentials entered!",
+    });
+  } else {
+    // Check if user exist
+    User.find({ email }).then((data) => {
+      if (data) {
+        // User exist
+
+        const hashedPassword = data[0].password;
+        bcrypt
+          .compare(password, hashedPassword)
+          .then((result) => {
+            if (result) {
+              // password matched
+              res.status(201).json({
+                message: "Signed in successfully!",
+                data: data,
+              });
+            } else {
+              res.status(500).json({
+                error: "Invalid password entered!",
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(500).json({
+              error: "Invalid credentials entered!",
+            });
+          });
+      }
+    });
   }
 });
 
