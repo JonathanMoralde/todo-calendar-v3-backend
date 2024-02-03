@@ -111,9 +111,28 @@ router.post("/signin", (req, res) => {
           .then((result) => {
             if (result) {
               // password matched
-              res.status(201).json({
-                message: "Signed in successfully!",
-                data: data,
+              // regenerate the session, which is good practice to help
+              // guard against forms of session fixation
+              req.session.regenerate(function (err) {
+                if (err)
+                  res
+                    .status(500)
+                    .json({ error: "Failed to generate user session!" });
+
+                // store user information in session, typically a user id
+                req.session.user = data[0]._id;
+
+                // save the session before redirection to ensure page
+                // load does not happen before session is saved
+                req.session.save(function (err) {
+                  if (err)
+                    return res
+                      .status(500)
+                      .json({ error: "Failed to save user session!" });
+                  res
+                    .status(201)
+                    .json({ message: "Signed in successfully!", data: data });
+                });
               });
             } else {
               res.status(500).json({
@@ -130,6 +149,31 @@ router.post("/signin", (req, res) => {
       }
     });
   }
+});
+
+router.post("/signout", (req, res) => {
+  // Clear the user from the session object
+  req.session.user = null;
+
+  // No need to regenerate and save the session again since it's a sign-out
+  // (Optional) You can destroy the session if you want to ensure that the session is completely removed from the store.
+  req.session.destroy(function (err) {
+    if (err) {
+      console.error(err);
+      res.status(404).json({ error: "Failed to sign out" });
+    } else {
+      res.status(201).json({ message: "Signed out successfully!" });
+    }
+  });
+});
+
+// Check session endpoint
+router.get("/check-session", (req, res) => {
+  const isAuthenticated = req.session.user ? true : false;
+
+  res.json({
+    authenticated: isAuthenticated,
+  });
 });
 
 module.exports = router;

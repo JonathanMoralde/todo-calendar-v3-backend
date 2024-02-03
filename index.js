@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 const addTask = require("./api/addTask");
 const getTask = require("./api/getTask");
 const getDates = require("./api/getDateWithTask");
@@ -24,8 +27,29 @@ mongoose
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.log(err));
 
+const store = new MongoDBStore({
+  uri: process.env.MONGODB_URL,
+  collection: "sessions", // Collection name to store sessions in MongoDB
+  expires: 1000 * 60 * 60 * 24 * 7, // Session will expire after 7 days (adjust as needed)
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+
+// Session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "Python whey",
+    resave: false,
+    saveUninitialized: true,
+    store: store,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Cookie will expire after 7 days (adjust as needed)
+    },
+  })
+);
 
 // Allow requests from http://localhost:3000
 app.use(cors({ origin: "https://splendid-squirrel-84a56d.netlify.app" }));

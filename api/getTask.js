@@ -7,9 +7,10 @@ router.use(bodyParser.json());
 
 router.get("/getTask/:date", async (req, res) => {
   const date = req.params.date;
+  const userId = req.session.user;
 
   try {
-    const dateTasks = await Date.findOne({ date: date });
+    const dateTasks = await Date.findOne({ date: date, userId: userId });
     if (dateTasks) {
       const tasks = dateTasks.tasks;
 

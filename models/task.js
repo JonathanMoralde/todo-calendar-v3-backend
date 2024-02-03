@@ -8,6 +8,7 @@ const taskSchema = new mongoose.Schema({
 const dateSchema = new mongoose.Schema({
   date: String,
   tasks: [taskSchema],
+  userId: String,
 });
 
 const Date = mongoose.model("Date", dateSchema);
