@@ -104,48 +104,59 @@ router.post("/signin", (req, res) => {
     User.find({ email }).then((data) => {
       if (data) {
         // User exist
-
-        const hashedPassword = data[0].password;
-        bcrypt
-          .compare(password, hashedPassword)
-          .then((result) => {
-            if (result) {
-              // password matched
-              // regenerate the session, which is good practice to help
-              // guard against forms of session fixation
-              req.session.regenerate(function (err) {
-                if (err)
-                  res
-                    .status(500)
-                    .json({ error: "Failed to generate user session!" });
-
-                // store user information in session, typically a user id
-                req.session.user = data[0]._id;
-
-                // save the session before redirection to ensure page
-                // load does not happen before session is saved
-                req.session.save(function (err) {
-                  if (err)
-                    return res
+        try {
+          const hashedPassword = data[0].password;
+          bcrypt
+            .compare(password, hashedPassword)
+            .then((result) => {
+              if (result) {
+                // password matched
+                // regenerate the session, which is good practice to help
+                // guard against forms of session fixation
+                req.session.regenerate(function (err) {
+                  if (err) {
+                    res
                       .status(500)
-                      .json({ error: "Failed to save user session!" });
-                  res
-                    .status(201)
-                    .json({ message: "Signed in successfully!", data: data });
+                      .json({ error: "Failed to generate user session!" });
+                  } else {
+                    // store user information in session, typically a user id
+                    req.session.user = data[0]._id;
+                    req.session.firstName = data[0].firstName;
+
+                    // save the session before redirection to ensure page
+                    // load does not happen before session is saved
+                    req.session.save(function (err) {
+                      if (err) {
+                        res
+                          .status(500)
+                          .json({ error: "Failed to save user session!" });
+                      } else {
+                        res.status(201).json({
+                          message: "Signed in successfully!",
+                          data: data[0],
+                        });
+                      }
+                    });
+                  }
                 });
-              });
-            } else {
+              } else {
+                res.status(500).json({
+                  error: "Invalid password entered!",
+                });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
               res.status(500).json({
-                error: "Invalid password entered!",
+                error: "Invalid credentials entered!",
               });
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(500).json({
-              error: "Invalid credentials entered!",
             });
-          });
+        } catch (error) {
+          console.log(error);
+          res
+            .status(500)
+            .json({ error: "An error occured while signing in user" });
+        }
       }
     });
   }
@@ -173,6 +184,15 @@ router.get("/check-session", (req, res) => {
 
   res.json({
     authenticated: isAuthenticated,
+  });
+});
+
+// get user name
+router.get("/get-name", (req, res) => {
+  const fName = req.session.firstName ? req.session.firstName : "User";
+
+  res.json({
+    name: fName,
   });
 });
 

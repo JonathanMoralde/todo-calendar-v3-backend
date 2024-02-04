@@ -47,12 +47,19 @@ app.use(
     store: store,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // Cookie will expire after 7 days (adjust as needed)
+      httpOnly: false,
     },
   })
 );
 
 // Allow requests from http://localhost:3000
-app.use(cors({ origin: "https://splendid-squirrel-84a56d.netlify.app" }));
+app.use(
+  cors({
+    origin: "http://localhost:8080",
+    credentials: true,
+    optionSuccessStatus: 201,
+  })
+);
 
 // POST - NEW TASK
 app.use("/api", addTask);
