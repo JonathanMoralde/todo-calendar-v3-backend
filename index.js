@@ -33,11 +33,6 @@ const store = new MongoDBStore({
   expires: 1000 * 60 * 60 * 24 * 7, // Session will expire after 7 days (adjust as needed)
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cookieParser());
-
 // Session middleware
 app.use(
   session({
@@ -51,6 +46,10 @@ app.use(
     },
   })
 );
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser());
 
 // Allow requests from http://localhost:3000
 app.use(
@@ -60,6 +59,9 @@ app.use(
     optionSuccessStatus: 201,
   })
 );
+
+// signin & signup USER
+app.use("/user", userRouter);
 
 // POST - NEW TASK
 app.use("/api", addTask);
@@ -78,8 +80,5 @@ app.use("/api", updateTaskStatus);
 
 // DELETE TASK
 app.use("/api", deleteTask);
-
-// signin & signup USER
-app.use("/user", userRouter);
 
 app.listen(PORT, () => console.log(`Listening on: ${PORT}`));

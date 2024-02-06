@@ -168,7 +168,7 @@ router.post("/signout", (req, res) => {
 
   // No need to regenerate and save the session again since it's a sign-out
   // (Optional) You can destroy the session if you want to ensure that the session is completely removed from the store.
-  req.session.destroy(function (err) {
+  req.session.destroy((err) => {
     if (err) {
       console.error(err);
       res.status(404).json({ error: "Failed to sign out" });
